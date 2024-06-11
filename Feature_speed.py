@@ -11,31 +11,33 @@ def write_macro(line:str)->str:
     Args:
         line (str): The line to be modified.
     Returns:
-        str: The line without unwanted characters.
+        str: The line without unwanted characters and capitalized.
     """
     line = line.replace(" ", "_").replace(":", "_").replace(";", "").replace("\n", "").replace("/","_")
-    # nur grßbuchstaben???
+    line = line.upper()
     return line
     
 # changes comments to get macros enabled
 path = sys.argv[1]
 with open(path, 'r') as gcode:
     lines = gcode.readlines()
-gcode.close()
 
 try:
     with open(path, 'w') as gcode:
         for line in lines:
             if line.startswith(';TYPE:'):
-                line = write_macro(line)
+                line = write_macro(line) 
                 # append when is new type
                 if line not in Features:
                     Features.append(line)
+                
+                line += '\n'
 
             gcode.write(line)
 
 except Exception as e:
     traceback.print_exc()
+    input("Press Enter to continue...")
 
 # TODO testen ob flow zurückgesetzt wird jedes mal wenn gecalled wird
 # automatically write the cfg file
