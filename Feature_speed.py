@@ -16,7 +16,7 @@ def write_macro(line:str)->str:
     line = line.replace(" ", "_").replace(":", "_").replace(";", "").replace("\n", "").replace("/","_")
     line = line.upper()
     return line
-    
+ 
 # changes comments to get macros enabled
 path = sys.argv[1]
 with open(path, 'r') as gcode:
@@ -26,12 +26,14 @@ try:
     with open(path, 'w') as gcode:
         for line in lines:
             if line.startswith(';TYPE:'):
+                old_line = line
                 line = write_macro(line) 
                 # append when is new type
                 if line not in Features:
                     Features.append(line)
                 
                 line += '\n'
+                line += old_line # add the original line relevant for gcode previewer
 
             gcode.write(line)
 
@@ -39,16 +41,38 @@ except Exception as e:
     traceback.print_exc()
     input("Press Enter to continue...")
 
+#Features = ["TYPE_INFILL","TYPE_WALL_INNER"]
 # TODO testen ob flow zurückgesetzt wird jedes mal wenn gecalled wird
 # automatically write the cfg file
 if WRITE_MACRO:
     with open(MACRO_PATH, 'w') as cfg:
+        # TODO add source and title
+        cfg.write("# Title: Feature speed macros\n")
         for i,macro in enumerate(Features):
             cfg.write("[gcode_macro " + macro + "] \n")
+            cfg.write("variable_speed_factor: 100\n")
             cfg.write("gcode:\n")
-            name = "SPEED_"+ str(i) 
-            cfg.write("    {% set "+ name +" = params."+ name +"|default(100)|int %} \n")
-            cfg.write("    M220 S{"+ name +"}\n")
-            out =  macro + " Speed: {"+ name +"}"
+            #name = "SPEED_"+ str(i) 
+            
+            cfg.write("    M220 S{"+"speed_factor"+"}\n")
+            # can be deleted later
+            out =  macro + " Speed: {"+"speed_factor"+"}"
             cfg.write("    SHOW_MSG MSG="+"\"{}\"".format(out) + "\n") #check speed with message
             cfg.write("\n")
+
+            # second macro to write to variable
+            cfg.write("[gcode_macro SET" + macro[4:] + "_SPEED] \n")
+            cfg.write("gcode:\n")
+            cfg.write("    {% set speed = params.SPEED|default(100)|int %} \n")
+            cfg.write("    SET_GCODE_VARIABLE MACRO="+ macro + " VARIABLE=speed_factor VALUE={speed}\n")
+            cfg.write("\n")
+
+        # TODO makro das alles zurücksetzt
+        cfg.write("[gcode_macro GLOBAL_SPEED] \n")
+        cfg.write("description: Set the speed for all features\n")
+        cfg.write("gcode:\n")
+        cfg.write("    {% set speed = params.SPEED|default(100)|int %} \n")
+        for macro in Features:
+            cfg.write("    SET_GCODE_VARIABLE MACRO="+ macro + " VARIABLE=speed_factor VALUE={speed}\n")
+        # write speed at the moment
+        cfg.write("    M220 S{" + "speed" + "}")
