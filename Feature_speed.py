@@ -1,7 +1,16 @@
+#!/usr/bin/env python3
+"""
+Feature based speedfor 3D prints using klipper firmware.
+
+License: MIT
+Author: Benedikt Jansson - WatchingWatches
+Version: 1.0
+"""
 import sys
 import traceback
 
 WRITE_MACRO = True
+# change to your path
 MACRO_PATH = r"C:\Users\bjans\OneDrive\Dokumente\CAD\Software\post_processing_gcode\Feature_speed_macro\Feature_speed.cfg"
 
 Features = []
@@ -41,12 +50,10 @@ except Exception as e:
     traceback.print_exc()
     input("Press Enter to continue...")
 
-#Features = ["TYPE_INFILL","TYPE_WALL_INNER"]
-# TODO testen ob flow zurückgesetzt wird jedes mal wenn gecalled wird
+
 # automatically write the cfg file
 if WRITE_MACRO:
     with open(MACRO_PATH, 'w') as cfg:
-        # TODO add source and title
         cfg.write("# Title: Feature speed macros\n")
         for i,macro in enumerate(Features):
             cfg.write("[gcode_macro " + macro + "] \n")
@@ -67,7 +74,7 @@ if WRITE_MACRO:
             cfg.write("    SET_GCODE_VARIABLE MACRO="+ macro + " VARIABLE=speed_factor VALUE={speed}\n")
             cfg.write("\n")
 
-        # TODO makro das alles zurücksetzt
+        # macro which sets the speed for all features
         cfg.write("[gcode_macro GLOBAL_SPEED] \n")
         cfg.write("description: Set the speed for all features\n")
         cfg.write("gcode:\n")
