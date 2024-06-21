@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Feature based speedfor 3D prints using klipper firmware.
+Feature based speed for 3D prints using klipper firmware.
 
 License: MIT
 Author: Benedikt Jansson - WatchingWatches
@@ -9,8 +9,8 @@ Version: 1.0
 import sys
 import traceback
 
-WRITE_MACRO = True
-# change to your path
+WRITE_MACRO = False
+# change to your path (needs to be absolute path)
 MACRO_PATH = r"C:\Users\bjans\OneDrive\Dokumente\CAD\Software\post_processing_gcode\Feature_speed_macro\Feature_speed.cfg"
 
 Features = []
@@ -55,6 +55,7 @@ except Exception as e:
 if WRITE_MACRO:
     with open(MACRO_PATH, 'w') as cfg:
         cfg.write("# Title: Feature speed macros\n")
+        cfg.write("# Source: https://github.com/WatchingWatches/Klipper-Custom-Feature-Speed/tree/main \n")
         for i,macro in enumerate(Features):
             cfg.write("[gcode_macro " + macro + "] \n")
             cfg.write("variable_speed_factor: 100\n")
