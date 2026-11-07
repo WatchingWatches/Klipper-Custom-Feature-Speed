@@ -18,10 +18,10 @@ Use ``GLOBAL_SPEED`` instead, which works like the old M220 command.
 ## How to set up:
 1. Set ``Feature_speed.py`` as a postprocessing script in your slicer [here is a guide](https://github.com/WatchingWatches/Post_processing_gcode?tab=readme-ov-file#how-to-run-script-from-slic3rprusaslicerorcaslicer)
 
-2. Optional Generate the macro. There are already two files available for orca and prusa slicer (i can't guarantee, that every feature type is included):
+2. Optionally generate the macro. There are already two files available for orca and prusa slicer (i can't guarantee, that every feature type is included):
 - set ``MACRO_PATH`` to a path on your computer and set ``WRITE_MACRO = True``
 - check that the comment in the gcode indicating the feature type starts with ``;TYPE:``
-if it's different in your slicer change ``if line.startswith(';TYPE:'):`` to match the beginning of the comment.
+if it's different in your slicer change ``type_indicator`` to match the beginning of the comment.
 The beginning of the line needs to be always the same. 
 - save a gcode file from your slicer, which includes every feature type available in the slicer. The macro will be written automatically to the given path.
 
